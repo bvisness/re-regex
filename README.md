@@ -41,4 +41,49 @@ Re-regex provides two main features:
 
 Re-regex provides a simple class that mimics Python's `re` module. It also provides several helpful functions like `wrap`, `maybe`, and `one_of` to help you build a re-regex in an intuitive way. All re-regex objects are composable and will never have conflicting names.
 
-Re-regex enables you to build an entire library of small, easily understood regular expressions, then combine them to recognize more and more complex patterns, without ever getting confusing or overwhelming.
+Here's what our above example looks like in re-regex:
+
+```python
+RE_ARG = wrap([
+    name('arg_name', wrap(r'[a-zA-Z_-]+')),
+    maybe([
+        r'\s*=\s*',
+        one_of([
+            [
+                name('quote', r'\'|"'),
+                name('quoted_val', r'.*?'),
+                backref('quote'),
+            ],
+            name('bare_val', r'[^\s\]]+'),
+        ]),
+    ]),
+])
+
+RE_TAG = wrap([
+    r'\[\s*',
+    RE_ARG,
+    zero_or_more([
+        r'\s+',
+        RE_ARG,
+    ]),
+    r'\s*\]',
+])
+
+print(RE_ARG)
+print(RE_TAG)
+
+tag = '[quote = \'bvisness\' post=123 foo="bar" baz]'
+
+tag_match = RE_TAG.search(tag)
+if tag_match:
+    for arg_match in RE_ARG.finditer(tag_match.group(0)):
+        print(arg_match.group('arg_name'), arg_match.group('quoted_val'), arg_match.group('bare_val'))
+        
+# prints:
+# quote bvisness None
+# post None 123
+# foo bar None
+# baz None None
+```
+
+Re-regex enables you to build an entire library of small, easily understood regular expressions, then combine them to recognize more and more complex patterns, without it ever getting confusing or overwhelming.
