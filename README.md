@@ -2,6 +2,8 @@
 
 An experiment in making composable and friendly regular expressions.
 
+Watch the video of me creating this project: https://youtu.be/DJyFUzqcSvE
+
 ## What's the idea?
 
 Say you're parsing something like XML. You're looking for tags with some number of arguments, that might or might not be quoted. Example:
